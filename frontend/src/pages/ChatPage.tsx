@@ -33,6 +33,7 @@ export default function ChatPage() {
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const dirtyRef = useRef(false);
+  const sendingRef = useRef(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const loadConversations = () =>
@@ -139,17 +140,21 @@ export default function ChatPage() {
   };
 
   const runChat = async (message: string) => {
-    if (!message.trim() || streaming) return;
+    if (!message.trim() || sendingRef.current) return;
+    // 同期的なロックを await より前に取得し、連打による会話の二重生成・並行実行を防ぐ
+    sendingRef.current = true;
+    setStreaming(true);
     let convId: string;
     try {
       convId = await ensureConversation();
     } catch {
       push({ id: newId(), kind: "error", text: "会話の作成に失敗しました。" });
+      setStreaming(false);
+      sendingRef.current = false;
       return;
     }
     push({ id: newId(), kind: "user", text: message });
     setInput("");
-    setStreaming(true);
     dirtyRef.current = true;
     try {
       for await (const ev of streamChat(message, convId)) {
@@ -216,6 +221,7 @@ export default function ChatPage() {
     } finally {
       finalizeTools();
       setStreaming(false);
+      sendingRef.current = false;
     }
   };
 
