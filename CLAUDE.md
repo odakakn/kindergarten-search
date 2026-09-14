@@ -149,3 +149,15 @@ npm run dev
 - 認証は**簡易**（学習用）。本番強度ではない。
 - 秘密情報（`.env`）はコミットしない。
 - ツール/サブエージェントの追加手順は `.claude/rules/agent-development.md` を参照。
+
+## レビュー運用（Codex）
+
+実装は Claude Code（メインスレッド）が行い、**品質ゲートとして OpenAI Codex CLI にレビューを委ねる**。
+
+- 実行: Claude Code で `/codex-review` を実行（未コミット変更をレビュー。`base=<ブランチ>` /
+  `commit=<SHA>` で対象指定も可）。
+- 中身: `.claude/commands/codex-review.md` が `codex exec review --uncommitted` を呼び、
+  レビュー観点は `.claude/codex-review-prompt.md`（＋ `CLAUDE.md` / `.claude/rules/*`）を渡す。
+  特に**ストリーミング契約(NDJSON)の backend↔frontend 同期崩れ**を重点検出する。
+- 前提: `git` 管理下であること、Codex CLI 導入（`npm install -g @openai/codex`）＋
+  `codex login`（ChatGPT サインイン）済みであること。Codex はレビューのみで、修正は Claude が行う。

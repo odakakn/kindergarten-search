@@ -13,16 +13,19 @@ OpenAI Codex CLI の `review` サブコマンドで、現在の変更を別モ�
 1. `git status --short` で変更範囲を確認する。変更が無ければ「レビュー対象の変更がありません」と伝えて終了。
 
 2. 次を実行してレビューを取得する。`review` サブコマンドは既定でサンドボックス実行され、
-   コードを書き換えない:
+   コードを書き換えない。カスタム観点（ルーブリック）を PROMPT で渡すと、対象は既定で
+   **未コミット変更（staged/unstaged/untracked）**になる:
 
    ```bash
-   codex exec review --uncommitted "$(cat .claude/codex-review-prompt.md)"
+   codex exec review "$(cat .claude/codex-review-prompt.md)"
    ```
 
-   - `$ARGUMENTS` の解釈:
-     - 空 → 上記のまま（`--uncommitted`）。
-     - `base=<ブランチ>` → `--uncommitted` の代わりに `--base <ブランチ>` を使う。
-     - `commit=<SHA>` → `--commit <SHA>` を使う。
+   - 重要: `--uncommitted` / `--base` / `--commit` はカスタム PROMPT と**併用できない**
+     （`error: the argument '--uncommitted' cannot be used with '[PROMPT]'`）。
+     このため通常はフラグ無しで PROMPT のみを渡す（＝未コミット変更が対象）。
+   - `$ARGUMENTS` で対象を変えたい場合（ルーブリックは Codex 組み込みのレビュー観点に切替）:
+     - `base=<ブランチ>` → `codex exec review --base <ブランチ>`
+     - `commit=<SHA>` → `codex exec review --commit <SHA>`
    - 認証エラーで失敗する場合は、ユーザーに `codex login`（ChatGPT サインイン）を促す。
      `codex` が未検出の場合は `npm install -g @openai/codex` を促す。
 
