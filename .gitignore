@@ -1,0 +1,22 @@
+# Python
+backend/.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# 環境変数・秘密情報
+.env
+*.local
+
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# エディタ / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
