@@ -1,4 +1,5 @@
 """ユーザー本人情報とプロフィール（属性）管理。"""
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
@@ -21,9 +22,7 @@ async def get_profile(uid: str = Depends(get_current_user_id)) -> Profile:
 
 
 @router.put("/profile", response_model=Profile)
-async def update_profile(
-    body: ProfileUpdate, uid: str = Depends(get_current_user_id)
-) -> Profile:
+async def update_profile(body: ProfileUpdate, uid: str = Depends(get_current_user_id)) -> Profile:
     # None のフィールドは更新対象外（部分更新）
     updated = store.update_profile(uid, body.model_dump(exclude_none=True))
     return Profile(**updated)

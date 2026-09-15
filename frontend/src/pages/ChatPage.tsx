@@ -70,7 +70,6 @@ export default function ChatPage() {
     apiPut(`/api/conversations/${currentId}`, { messages, title: deriveTitle(messages) })
       .then(() => loadConversations())
       .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streaming, messages, currentId]);
 
   const markLastToolDone = (arr: Msg[]): Msg[] => {

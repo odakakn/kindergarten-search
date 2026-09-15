@@ -1,4 +1,5 @@
 """お気に入り一覧と、参照用の幼稚園エンドポイント。"""
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -54,5 +55,7 @@ async def cancel_visit_request(
 ) -> VisitRequestRecord:
     rec = store.cancel_visit_request(uid, confirmation_id)
     if not rec:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="見学申込が見つかりません")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="見学申込が見つかりません"
+        )
     return VisitRequestRecord(**rec)

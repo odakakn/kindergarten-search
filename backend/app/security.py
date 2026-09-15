@@ -3,6 +3,7 @@
 本番強度の認証ではない点に注意。bcrypt 等のネイティブ依存を避けるため
 hashlib.pbkdf2_hmac を用いている（Python 3.14 でも追加ビルド不要）。
 """
+
 from __future__ import annotations
 
 import hashlib

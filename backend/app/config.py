@@ -1,4 +1,5 @@
 """環境変数から読み込むアプリ設定。"""
+
 from __future__ import annotations
 
 import os
@@ -25,9 +26,9 @@ SUB_MODEL: str = os.environ.get("KG_SUB_MODEL", "sonnet")
 # CORS 許可オリジン（カンマ区切り）。
 CORS_ORIGINS: list[str] = [
     o.strip()
-    for o in os.environ.get(
-        "KG_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
-    ).split(",")
+    for o in os.environ.get("KG_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(
+        ","
+    )
     if o.strip()
 ]
 

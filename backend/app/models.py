@@ -1,7 +1,8 @@
 """API の入出力に使う Pydantic モデル。"""
+
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -27,17 +28,17 @@ class LoginResponse(BaseModel):
 class Profile(BaseModel):
     """幼稚園レコメンドのコンテキストとなるユーザー属性。すべて任意。"""
 
-    child_name: Optional[str] = None
-    child_age: Optional[int] = Field(default=None, description="子どもの年齢（歳）")
-    home_area: Optional[str] = Field(default=None, description="居住エリア（例: 世田谷区）")
-    commute_method: Optional[str] = Field(default=None, description="通園手段（徒歩/自転車/バス等）")
-    budget_max: Optional[int] = Field(default=None, description="月額上限（円）")
+    child_name: str | None = None
+    child_age: int | None = Field(default=None, description="子どもの年齢（歳）")
+    home_area: str | None = Field(default=None, description="居住エリア（例: 世田谷区）")
+    commute_method: str | None = Field(default=None, description="通園手段（徒歩/自転車/バス等）")
+    budget_max: int | None = Field(default=None, description="月額上限（円）")
     priorities: list[str] = Field(default_factory=list, description="重視する条件のタグ")
-    desired_hours: Optional[str] = Field(default=None, description="希望する保育時間帯")
-    needs_bus: Optional[bool] = Field(default=None, description="送迎バスが必要か")
-    siblings: Optional[str] = Field(default=None, description="きょうだい構成など")
-    allergies: Optional[str] = Field(default=None, description="アレルギー等の配慮事項")
-    notes: Optional[str] = Field(default=None, description="その他自由記述")
+    desired_hours: str | None = Field(default=None, description="希望する保育時間帯")
+    needs_bus: bool | None = Field(default=None, description="送迎バスが必要か")
+    siblings: str | None = Field(default=None, description="きょうだい構成など")
+    allergies: str | None = Field(default=None, description="アレルギー等の配慮事項")
+    notes: str | None = Field(default=None, description="その他自由記述")
 
 
 class ProfileUpdate(Profile):
@@ -63,7 +64,7 @@ class Kindergarten(BaseModel):
     lunch_type: str
     education_style: str
     philosophy: str
-    url: Optional[str] = None
+    url: str | None = None
 
 
 # ---- 見学申込 ----
@@ -94,7 +95,7 @@ class ConversationDetail(BaseModel):
 
 class SaveConversationRequest(BaseModel):
     messages: list[dict[str, Any]] = Field(default_factory=list)
-    title: Optional[str] = None
+    title: str | None = None
 
 
 # ---- チャット ----
