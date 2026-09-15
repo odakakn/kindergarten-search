@@ -3,6 +3,7 @@
 司令塔（メイン）と 2 体のサブエージェント（recommender / visit-coordinator）の
 役割を定義する。会話・出力は日本語を既定とする。
 """
+
 from __future__ import annotations
 
 import json

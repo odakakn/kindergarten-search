@@ -7,6 +7,7 @@
 - ui_queue には検索結果カードやお気に入り/見学申込の構造化イベントを流し、
   ランナーがチャットストリームへ差し込む（フロントのリッチ表示用）。
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -38,7 +39,7 @@ def _kg_summary(kg: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def build_kg_server(user_id: str, ui_queue: "asyncio.Queue[dict[str, Any]]") -> McpSdkServerConfig:
+def build_kg_server(user_id: str, ui_queue: asyncio.Queue[dict[str, Any]]) -> McpSdkServerConfig:
     """user_id と ui_queue を束縛した MCP サーバー設定を生成する。"""
 
     def push(event: dict[str, Any]) -> None:
@@ -162,7 +163,11 @@ def build_kg_server(user_id: str, ui_queue: "asyncio.Queue[dict[str, Any]]") -> 
     )
     async def list_favorites(args: dict[str, Any]) -> dict[str, Any]:
         favs = [_kg_summary(kg) for kg in store.list_favorites(user_id)]
-        return {"content": [{"type": "text", "text": json.dumps({"favorites": favs}, ensure_ascii=False)}]}
+        return {
+            "content": [
+                {"type": "text", "text": json.dumps({"favorites": favs}, ensure_ascii=False)}
+            ]
+        }
 
     @tool(
         "submit_visit_request",
@@ -236,7 +241,11 @@ def build_kg_server(user_id: str, ui_queue: "asyncio.Queue[dict[str, Any]]") -> 
             }
             for r in store.list_visit_requests(user_id)
         ]
-        return {"content": [{"type": "text", "text": json.dumps({"visit_requests": items}, ensure_ascii=False)}]}
+        return {
+            "content": [
+                {"type": "text", "text": json.dumps({"visit_requests": items}, ensure_ascii=False)}
+            ]
+        }
 
     @tool(
         "cancel_visit_request",
@@ -251,7 +260,9 @@ def build_kg_server(user_id: str, ui_queue: "asyncio.Queue[dict[str, Any]]") -> 
         rec = store.cancel_visit_request(user_id, args["confirmation_id"])
         if not rec:
             return {
-                "content": [{"type": "text", "text": "その確認番号の見学申込が見つかりませんでした。"}],
+                "content": [
+                    {"type": "text", "text": "その確認番号の見学申込が見つかりませんでした。"}
+                ],
                 "is_error": True,
             }
         push(

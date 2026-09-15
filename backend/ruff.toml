@@ -1,0 +1,15 @@
+# ruff 設定（backend）。パッケージ化はしないため pyproject.toml は作らず lint 設定のみをここに置く。
+target-version = "py314"
+line-length = 100
+
+extend-exclude = [".venv", "__pycache__"]
+
+[lint]
+# 基礎ルールセット: pycodestyle(E) / pyflakes(F) / isort(I) / flake8-bugbear(B) / pyupgrade(UP)
+select = ["E", "F", "I", "B", "UP"]
+
+[lint.per-file-ignores]
+# 日本語のシステムプロンプト prose / ツールスキーマの description は
+# 1 行で保持したいため、この2ファイルのみ行長(E501)を除外する。
+"app/agent/prompts.py" = ["E501"]
+"app/agent/tools.py" = ["E501"]

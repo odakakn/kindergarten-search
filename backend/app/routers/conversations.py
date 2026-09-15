@@ -1,4 +1,5 @@
 """チャット履歴（会話）の CRUD。会話はサーバ側インメモリに保持する。"""
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status

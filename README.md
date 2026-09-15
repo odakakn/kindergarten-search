@@ -1,5 +1,7 @@
 # 🌷 幼稚園さがしコンシェルジュ
 
+[![CI](https://github.com/odakakn/kindergarten-search/actions/workflows/ci.yml/badge.svg)](https://github.com/odakakn/kindergarten-search/actions/workflows/ci.yml)
+
 自分にピッタリの幼稚園を探すための、チャット型 AI エージェント Web アプリ（学習用）。
 
 - **相談チャット**: 希望条件を伝えると、マルチエージェントが幼稚園をレコメンドし、

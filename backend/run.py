@@ -13,6 +13,7 @@ Python 3.14 では `set_event_loop_policy` / `*EventLoopPolicy` が非推奨の�
     python run.py
 ※ ホットリロードは未対応（Windows のループ制約のため）。コード変更は手動で再起動して反映。
 """
+
 from __future__ import annotations
 
 import asyncio

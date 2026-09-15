@@ -1,4 +1,5 @@
 """認証ユーティリティと FastAPI 依存関数。"""
+
 from __future__ import annotations
 
 from fastapi import Header, HTTPException, status

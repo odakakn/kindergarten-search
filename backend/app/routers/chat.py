@@ -1,4 +1,5 @@
 """幼稚園検索〜見学申込エージェントのチャットエンドポイント（ストリーミング）。"""
+
 from __future__ import annotations
 
 import json

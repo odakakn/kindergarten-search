@@ -3,12 +3,13 @@
 REST エンドポイントとエージェントの MCP ツールが同一の ``store`` インスタンスを
 共有する。学習用のため永続化はしない（プロセス終了で消える）。
 """
+
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from .security import hash_password, new_token, verify_password
 
@@ -93,7 +94,7 @@ class Store:
         username: str,
         password: str,
         display_name: str,
-        profile: Optional[dict[str, Any]] = None,
+        profile: dict[str, Any] | None = None,
     ) -> str:
         uid = f"user-{len(self.users) + 1:03d}"
         self.users[uid] = {
@@ -107,7 +108,7 @@ class Store:
         self.favorites[uid] = []
         return uid
 
-    def authenticate(self, username: str, password: str) -> Optional[str]:
+    def authenticate(self, username: str, password: str) -> str | None:
         uid = self._username_index.get(username)
         if not uid:
             return None
@@ -120,7 +121,7 @@ class Store:
         self.tokens[token] = uid
         return token
 
-    def user_for_token(self, token: str) -> Optional[str]:
+    def user_for_token(self, token: str) -> str | None:
         return self.tokens.get(token)
 
     def revoke_token(self, token: str) -> None:
@@ -145,7 +146,7 @@ class Store:
     def all_kindergartens(self) -> list[dict[str, Any]]:
         return list(self.kindergartens.values())
 
-    def get_kindergarten(self, kid: str) -> Optional[dict[str, Any]]:
+    def get_kindergarten(self, kid: str) -> dict[str, Any] | None:
         return self.kindergartens.get(kid)
 
     def search(self, filters: dict[str, Any], limit: int = 5) -> list[dict[str, Any]]:
@@ -226,9 +227,7 @@ class Store:
     # ---- お気に入り ----
     def list_favorites(self, uid: str) -> list[dict[str, Any]]:
         return [
-            self.kindergartens[k]
-            for k in self.favorites.get(uid, [])
-            if k in self.kindergartens
+            self.kindergartens[k] for k in self.favorites.get(uid, []) if k in self.kindergartens
         ]
 
     def add_favorite(self, uid: str, kid: str) -> bool:
@@ -256,7 +255,7 @@ class Store:
         kid: str,
         preferred_dates: list[str],
         applicant_note: str = "",
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         kg = self.kindergartens.get(kid)
         if not kg:
             return None
@@ -269,7 +268,7 @@ class Store:
             "preferred_dates": preferred_dates,
             "applicant_note": applicant_note,
             "status": "received",
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
         self.visit_requests.append(record)
         return record
@@ -277,13 +276,13 @@ class Store:
     def list_visit_requests(self, uid: str) -> list[dict[str, Any]]:
         return [r for r in self.visit_requests if r["user_id"] == uid]
 
-    def find_visit_request(self, uid: str, confirmation_id: str) -> Optional[dict[str, Any]]:
+    def find_visit_request(self, uid: str, confirmation_id: str) -> dict[str, Any] | None:
         for r in self.visit_requests:
             if r["confirmation_id"] == confirmation_id and r["user_id"] == uid:
                 return r
         return None
 
-    def cancel_visit_request(self, uid: str, confirmation_id: str) -> Optional[dict[str, Any]]:
+    def cancel_visit_request(self, uid: str, confirmation_id: str) -> dict[str, Any] | None:
         """所有する見学申込を取消（status=cancelled）にする。未存在なら None。
 
         既に cancelled の場合はそのまま返す（冪等）。
@@ -297,7 +296,7 @@ class Store:
     def create_conversation(self, uid: str, title: str = "新しいチャット") -> dict[str, Any]:
         self._conv_seq += 1
         cid = f"conv-{self._conv_seq:04d}"
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         conv = {
             "id": cid,
             "user_id": uid,
@@ -311,7 +310,7 @@ class Store:
         self.user_conversations.setdefault(uid, []).insert(0, cid)
         return conv
 
-    def _owned_conversation(self, uid: str, cid: str) -> Optional[dict[str, Any]]:
+    def _owned_conversation(self, uid: str, cid: str) -> dict[str, Any] | None:
         conv = self.conversations.get(cid)
         return conv if conv and conv["user_id"] == uid else None
 
@@ -330,7 +329,7 @@ class Store:
                 )
         return out
 
-    def get_conversation(self, uid: str, cid: str) -> Optional[dict[str, Any]]:
+    def get_conversation(self, uid: str, cid: str) -> dict[str, Any] | None:
         return self._owned_conversation(uid, cid)
 
     def save_conversation(
@@ -338,15 +337,15 @@ class Store:
         uid: str,
         cid: str,
         messages: list[dict[str, Any]],
-        title: Optional[str] = None,
-    ) -> Optional[dict[str, Any]]:
+        title: str | None = None,
+    ) -> dict[str, Any] | None:
         conv = self._owned_conversation(uid, cid)
         if not conv:
             return None
         conv["messages"] = messages
         if title:
             conv["title"] = title
-        conv["updated_at"] = datetime.now(timezone.utc).isoformat()
+        conv["updated_at"] = datetime.now(UTC).isoformat()
         # 直近更新を先頭へ
         lst = self.user_conversations.setdefault(uid, [])
         if cid in lst:
@@ -365,7 +364,7 @@ class Store:
         return True
 
     # 会話単位のエージェントセッション継続
-    def get_conv_session(self, cid: str) -> Optional[str]:
+    def get_conv_session(self, cid: str) -> str | None:
         conv = self.conversations.get(cid)
         return conv["session_id"] if conv else None
 

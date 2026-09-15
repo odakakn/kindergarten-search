@@ -1,4 +1,5 @@
 """FastAPI アプリ本体。CORS 設定とルーター登録。"""
+
 from __future__ import annotations
 
 from fastapi import FastAPI

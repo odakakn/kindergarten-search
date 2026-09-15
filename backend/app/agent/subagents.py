@@ -3,6 +3,7 @@
 司令塔（メイン）が Agent ツールで委譲する 2 体を定義する。
 各サブエージェントはインプロセス MCP サーバー "kg" のツールを利用できる。
 """
+
 from __future__ import annotations
 
 from claude_agent_sdk import AgentDefinition

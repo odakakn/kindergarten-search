@@ -5,6 +5,7 @@
 インプロセス MCP ツールが push した構造化イベント（cards/favorite/visit）は、
 各メッセージの後に ui_queue から取り出して差し込む。
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -92,7 +93,7 @@ def _tool_activity(name: str, tool_input: dict[str, Any]) -> dict[str, Any]:
 
 
 def _build_options(
-    user_id: str, conversation_id: str, ui_queue: "asyncio.Queue[dict[str, Any]]"
+    user_id: str, conversation_id: str, ui_queue: asyncio.Queue[dict[str, Any]]
 ) -> ClaudeAgentOptions:
     profile = store.get_profile(user_id)
     server = build_kg_server(user_id, ui_queue)
@@ -118,7 +119,7 @@ async def stream_chat(
     user_id: str, conversation_id: str, message: str
 ) -> AsyncIterator[dict[str, Any]]:
     """1 回のユーザー発話に対するエージェント応答を UI イベントとして逐次生成する。"""
-    ui_queue: "asyncio.Queue[dict[str, Any]]" = asyncio.Queue()
+    ui_queue: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
     options = _build_options(user_id, conversation_id, ui_queue)
 
     # Agent ツールの tool_use_id -> サブエージェント名（委譲先の作業ラベル付け用）
