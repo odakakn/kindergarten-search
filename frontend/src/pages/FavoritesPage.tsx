@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiDelete, apiGet, apiPost } from "../api/client";
 import KindergartenCard from "../components/KindergartenCard";
+import KindergartenDetailModal from "../components/KindergartenDetailModal";
 import type { Kindergarten, VisitRequest } from "../types";
 
 const statusLabel = (s: string) =>
@@ -10,6 +11,7 @@ export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<Kindergarten[]>([]);
   const [visits, setVisits] = useState<VisitRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [detailKg, setDetailKg] = useState<Kindergarten | null>(null);
 
   const load = () => {
     Promise.all([
@@ -66,6 +68,7 @@ export default function FavoritesPage() {
               kg={kg}
               favorited={true}
               onToggleFavorite={remove}
+              onOpenDetail={setDetailKg}
             />
           ))}
         </div>
@@ -107,6 +110,18 @@ export default function FavoritesPage() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {detailKg && (
+        <KindergartenDetailModal
+          kg={detailKg}
+          favorited={true}
+          onToggleFavorite={(kg) => {
+            void remove(kg);
+            setDetailKg(null);
+          }}
+          onClose={() => setDetailKg(null)}
+        />
       )}
     </div>
   );

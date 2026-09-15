@@ -339,6 +339,65 @@ textarea:focus {
   border-bottom-left-radius: 4px;
 }
 
+/* Markdown 描画（アシスタント吹き出し内）。見出し・箇条書きが巨大化しないよう余白を圧縮 */
+.bubble.markdown {
+  white-space: normal;
+}
+.bubble.markdown > :first-child {
+  margin-top: 0;
+}
+.bubble.markdown > :last-child {
+  margin-bottom: 0;
+}
+.bubble.markdown p {
+  margin: 0.3rem 0;
+}
+.bubble.markdown h1,
+.bubble.markdown h2,
+.bubble.markdown h3,
+.bubble.markdown h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0.6rem 0 0.3rem;
+  line-height: 1.4;
+}
+.bubble.markdown ul,
+.bubble.markdown ol {
+  margin: 0.3rem 0;
+  padding-left: 1.2rem;
+}
+.bubble.markdown li {
+  margin: 0.1rem 0;
+}
+.bubble.markdown a {
+  color: var(--accent);
+}
+.bubble.markdown code {
+  background: #f4efe8;
+  border-radius: 6px;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.85em;
+}
+.bubble.markdown pre {
+  background: #f4efe8;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  overflow-x: auto;
+}
+.bubble.markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+.bubble.markdown table {
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.bubble.markdown th,
+.bubble.markdown td {
+  border: 1px solid var(--line);
+  padding: 0.25rem 0.5rem;
+}
+
 .activity {
   display: flex;
   align-items: center;
@@ -506,10 +565,113 @@ textarea:focus {
 }
 .kg-actions {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 .kg-actions button {
   width: 100%;
   font-size: 0.85rem;
+}
+
+/* おすすめ順位バッジ */
+.kg-rank {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.05rem 0.55rem;
+  margin-bottom: 0.2rem;
+}
+
+/* タップで詳細を開けるカード */
+.kg-card.clickable {
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.05s, border-color 0.15s;
+}
+.kg-card.clickable:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(120, 100, 80, 0.16);
+}
+.kg-card.clickable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---- 詳細モーダル ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(51, 48, 44, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+}
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(80, 60, 40, 0.28);
+  width: min(560px, 100%);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.1rem 1.2rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+.modal-head h3 {
+  margin: 0.1rem 0 0;
+  font-size: 1.15rem;
+}
+.modal-close {
+  font-size: 1rem;
+  padding: 0.3rem 0.6rem;
+  flex-shrink: 0;
+}
+.modal-body {
+  padding: 1rem 1.2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.kg-specs {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 0.9rem;
+}
+.kg-spec-row {
+  display: contents;
+}
+.kg-spec-row dt {
+  color: var(--muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.kg-spec-row dd {
+  margin: 0;
+  font-size: 0.88rem;
+}
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.modal-actions .secondary {
+  margin-left: auto;
 }
 
 /* ---- Profile ---- */

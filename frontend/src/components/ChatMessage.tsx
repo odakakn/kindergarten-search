@@ -1,3 +1,5 @@
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { Kindergarten } from "../types";
 import KindergartenCard from "./KindergartenCard";
 
@@ -23,6 +25,7 @@ interface Props {
   favoritedIds: Set<string>;
   onToggleFavorite: (kg: Kindergarten) => void;
   onConsultVisit: (kg: Kindergarten) => void;
+  onOpenDetail: (kg: Kindergarten) => void;
 }
 
 export default function ChatMessage({
@@ -30,6 +33,7 @@ export default function ChatMessage({
   favoritedIds,
   onToggleFavorite,
   onConsultVisit,
+  onOpenDetail,
 }: Props) {
   switch (msg.kind) {
     case "user":
@@ -42,7 +46,9 @@ export default function ChatMessage({
       return (
         <div className="bubble-row left">
           <div className="avatar">🌷</div>
-          <div className="bubble assistant">{msg.text}</div>
+          <div className="bubble assistant markdown">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+          </div>
         </div>
       );
     case "tool":
@@ -61,13 +67,15 @@ export default function ChatMessage({
     case "cards":
       return (
         <div className="cards-grid">
-          {msg.items.map((kg) => (
+          {msg.items.map((kg, i) => (
             <KindergartenCard
               key={kg.id}
               kg={kg}
+              rank={i + 1}
               favorited={favoritedIds.has(kg.id)}
               onToggleFavorite={onToggleFavorite}
               onConsultVisit={onConsultVisit}
+              onOpenDetail={onOpenDetail}
             />
           ))}
         </div>

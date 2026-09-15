@@ -3,6 +3,7 @@ import { streamChat } from "../api/chatStream";
 import { apiDelete, apiGet, apiPost, apiPut } from "../api/client";
 import ChatMessage, { type Msg } from "../components/ChatMessage";
 import ConversationSidebar from "../components/ConversationSidebar";
+import KindergartenDetailModal from "../components/KindergartenDetailModal";
 import type { ConversationDetail, ConversationSummary, Kindergarten } from "../types";
 
 const newId = () =>
@@ -32,8 +33,11 @@ export default function ChatPage() {
   const [favoritedIds, setFavoritedIds] = useState<Set<string>>(new Set());
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
+  const [detailKg, setDetailKg] = useState<Kindergarten | null>(null);
   const dirtyRef = useRef(false);
   const sendingRef = useRef(false);
+  // カードは検索直後に即描画せず、説明テキストが出始める直前まで一旦バッファに溜める
+  const cardsBufferRef = useRef<Msg[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const loadConversations = () =>
@@ -83,6 +87,16 @@ export default function ChatPage() {
     setMessages((prev) =>
       prev.map((m) => (m.kind === "tool" && !m.done ? { ...m, done: true } : m)),
     );
+
+  // 溜めておいたカード（検索結果）を messages 末尾へ追加する。
+  // 最初の説明テキスト到達時に呼び、カードを本文の上に置く（テキストが無い場合の保険で finally でも呼ぶ）。
+  const flushCards = () => {
+    if (cardsBufferRef.current.length === 0) return;
+    const buffered = cardsBufferRef.current;
+    cardsBufferRef.current = [];
+    setMessages((prev) => [...prev, ...buffered]);
+    dirtyRef.current = true;
+  };
 
   const push = (m: Msg) => setMessages((prev) => [...markLastToolDone(prev), m]);
 
@@ -164,13 +178,16 @@ export default function ChatPage() {
         }
         switch (ev.type) {
           case "text":
+            // 説明テキストが出始める直前に、溜めたカードを先に描画する（カードが本文の上に来る）
+            flushCards();
             appendAssistantText(ev.text);
             break;
           case "tool_use":
             push({ id: newId(), kind: "tool", label: ev.label, agent: ev.agent });
             break;
           case "cards":
-            push({ id: newId(), kind: "cards", items: ev.items });
+            // 即時表示せずバッファへ。説明テキストが出そろうターン完了時にまとめて表示する。
+            cardsBufferRef.current.push({ id: newId(), kind: "cards", items: ev.items });
             break;
           case "favorite":
             setFavoritedIds((prev) => {
@@ -220,6 +237,7 @@ export default function ChatPage() {
       });
     } finally {
       finalizeTools();
+      flushCards();
       setStreaming(false);
       sendingRef.current = false;
     }
@@ -252,6 +270,7 @@ export default function ChatPage() {
   };
 
   const consultVisit = (kg: Kindergarten) => {
+    setDetailKg(null);
     void runChat(`「${kg.name}」（ID: ${kg.id}）の見学を申し込みたいです。`);
   };
 
@@ -290,6 +309,7 @@ export default function ChatPage() {
               favoritedIds={favoritedIds}
               onToggleFavorite={toggleFavorite}
               onConsultVisit={consultVisit}
+              onOpenDetail={setDetailKg}
             />
           ))}
           {streaming && (
@@ -313,6 +333,16 @@ export default function ChatPage() {
           </button>
         </form>
       </div>
+
+      {detailKg && (
+        <KindergartenDetailModal
+          kg={detailKg}
+          favorited={favoritedIds.has(detailKg.id)}
+          onToggleFavorite={toggleFavorite}
+          onConsultVisit={consultVisit}
+          onClose={() => setDetailKg(null)}
+        />
+      )}
     </div>
   );
 }
